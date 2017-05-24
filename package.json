@@ -1,0 +1,35 @@
+{
+  "name": "my_app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "grunt serve",
+    "build": "grunt",
+    "lint:js": "eslint --ignore-pattern '**/lib/*.js' apps/assets/js",
+    "lint:scss": "sass-lint -v -q",
+    "postinstall": "grunt"
+  },
+  "dependencies": {
+    "autoprefixer": "^6.0.0",
+    "connect-livereload": "^0.5.4",
+    "cssnano": "^3.4.0",
+    "eslint": "^3.0.0",
+    "grunt": "^1.0.0",
+    "grunt-bg-shell": "^2.3.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-postcss": "^0.8.0",
+    "grunt-sass": "^1.0.0",
+    "load-grunt-tasks": "^3.2.0",
+    "mocha": "^3.0.0",
+    "node-sass": "^3.7.0",
+    "sass-lint": "^1.7.0",
+    "time-grunt": "^1.2.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "^6.9.1"
+  }
+}

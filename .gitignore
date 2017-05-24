@@ -1,0 +1,75 @@
+### Project ###
+.env
+tmp
+*.sqlite
+
+# JS
+my_app/assets/public/js/*
+
+# Sass
+.sass-cache
+*.css
+*.css.map
+
+### DJANGO ###
+static/
+my_app/media/img/
+my_app/media/test/
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### SublimeText ###
+# cache files for sublime text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+# workspace files are user-specific
+*.sublime-workspace
+*.sublime-project
+
+# Basics
+*.py[cod]
+*.pyc
+__pycache__
+
+# Logs
+*.log
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+.cache
+
+# Translations
+*.mo
+*.pot
+
+# Pycharm
+.idea
+
+# Vim
+
+*~
+*.swp
+*.swo
+
+# npm
+node_modules/
+
+# virtual environment
+venv
+
+# Eclipse IDE
+.project
+
+# Rope mode
+.ropeproject
+
+logs

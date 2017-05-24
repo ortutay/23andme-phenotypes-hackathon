@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="index-hello-world">
+    <div class="index-hello-world-container">
+        {% include 'index/includes/hello_message.html' %}
+    </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,2 @@
+web: PYTHONPATH=./:$PYTHONPATH DJANGO_SETTINGS_MODULE=config.settings.local gunicorn config.wsgi:application --config config/gunicorn_local.py
+assets: ./node_modules/grunt-cli/bin/grunt serve

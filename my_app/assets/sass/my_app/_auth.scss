@@ -1,0 +1,8 @@
+.auth {
+    &-content {
+        padding: 10px 20px;
+        &-names, &-logout {
+            text-align: right;
+        }
+    }
+}

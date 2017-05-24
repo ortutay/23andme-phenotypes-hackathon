@@ -1,0 +1,3 @@
+[run]
+include = my_app/*
+omit = *migrations*, *tests*
