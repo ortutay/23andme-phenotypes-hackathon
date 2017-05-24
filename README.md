@@ -20,6 +20,7 @@ Requirements
 Development
 ---
 **If you work at 23andMe, check out [this guide](https://23andme.atlassian.net/wiki/display/ENG/Develop+against+a+local+API) to learn how to develop against your local API.**
+
 1. Clone the repo
 1. `cd` into the repo
 1. Run `./scripts/install_osx_dependencies.sh` if you have a mac and [homebrew](https://brew.sh/)
@@ -35,6 +36,7 @@ Development
 1. Start writing code!
 
 When you're done:
+
 1. `Ctrl-c` to quit the server
 1. Run `dactivate` to exit the virtual environment
 
