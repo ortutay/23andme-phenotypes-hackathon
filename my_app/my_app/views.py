@@ -5,22 +5,32 @@ from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.urls import reverse
 from django.views.generic.base import TemplateView, View
 from django.views.decorators.cache import never_cache
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+from django.shortcuts import redirect
 
 from my_app.lib.ttam_api.ttam_api.django.views import AuthenticatedMixin as TtamAuthenticatedMixin
 from my_app.lib.ttam_api.ttam_api.django.views import LogoutView as TtamLogoutView
 
-import json, base64, requests
+from my_app.my_app.models import Profile
+
+import json
+import base64
+import requests
+
+from my_app.my_app import facebook
+
 
 CLIENT_ID = '228JF7'
 CLIENT_SECRET = '188fe570134d6630e372c8cff3cac04f'
+
 
 class Index(TtamAuthenticatedMixin, TemplateView):
     template_name = 'index/index.html'
 
     def get_context_data(self, **kwargs):
-        import pdb; pdb.set_trace()
         context = super().get_context_data(**kwargs)
-        self.request.ttam.api.account
+        # import pdb; pdb.set_trace()
         accession_id = 'NC_000004.11'
         context['accession'] = self.request.ttam.api.get(
             f'/3/accession/{accession_id}/'
@@ -29,6 +39,20 @@ class Index(TtamAuthenticatedMixin, TemplateView):
         )
         context['first_name'] = self.request.ttam.account['first_name']
         context['last_name'] = self.request.ttam.account['last_name']
+
+        # this should probably go somewhere else. oh well!
+        user = User.objects.get(email=self.request.ttam.account['email'])
+        if not user:
+            user = User(
+                first_name=self.request.ttam.account['first_name'],
+                last_name=self.request.ttam.account['last_name'],
+                email=self.request.ttam.account['email'],
+                username=self.request.ttam.account['email'],
+                password='password')
+            user.profile = Profile()
+            user.save()
+        login(self.request, user)
+
         return context
 
 
@@ -99,6 +123,18 @@ def get_token(code):
     print("response for get token was:" + response.text)
     token_json = response.json()
     return token_json["access_token"]
+
+
+class FacebookHandlerView(View):
+    def get(self, request):
+        access_token = request.GET['access_token']
+        user_id = request.GET['user_id']
+        request.user.profile.facebook_token = access_token
+        request.user.profile.save()
+        facebook.process(request.user.profile.facebook_token)
+        return JsonResponse({})
+        return redirect('/')
+
 
 @never_cache
 def status(request):

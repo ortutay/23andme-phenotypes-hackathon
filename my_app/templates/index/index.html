@@ -2,9 +2,39 @@
 {% load static %}
 
 {% block content %}
-<section class="index-hello-world">
+<div class="container">
+  <section class="index-hello-world">
     <div class="index-hello-world-container">
-        {% include 'index/includes/hello_message.html' %}
+      {% include 'index/includes/hello_message.html' %}
     </div>
-</section>
+  </section>
+
+  <section>
+    <h1>Facebook</h1>
+    <!--
+    <div class="fb-login-button"
+      data-max-rows="1"
+      data-size="large"
+      data-button-type="continue_with"
+      data-show-faces="false"
+      data-auto-logout-link="false"
+      data-use-continue-as="false"
+      data-scope="user_posts,user_education_history,user_photos"
+      ></div>
+     -->
+
+    <script type="text/javascript">
+     function fb_login() {
+       FB.login(function(resp) {
+         if (resp.authResponse) {
+           console.log(resp.authResponse);
+           var auth = resp.authResponse;
+           window.location = '/facebook-handler?access_token=' + auth.accessToken + '&user_id=' + auth.userID;
+         }
+       })
+     }
+    </script>
+    <fb:login-button scope="user_posts,user_education_history,user_photos" onlogin="fb_login();"></fb:login-button>
+  </section>
+</div>
 {% endblock content %}
