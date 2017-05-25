@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^receive_code/$', OauthCallbackView.as_view(), name='oauth_callback'),
     url(r'^logout/$', my_app_views.LogoutView.as_view(), name='logout'),
     url(r'^home/$', RedirectView.as_view(url='/'), name='home'),
+    url(r'^fitbit-handler/$', my_app_views.FitbitHandlerView.as_view(), name='fitbit-handler'),
 ]
 
 

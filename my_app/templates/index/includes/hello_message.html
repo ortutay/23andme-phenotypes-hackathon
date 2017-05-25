@@ -1,8 +1,27 @@
 <div class="hello-message">
-    <p>Hello, world! Here is a chromosome:</p>
+    <!--<p>Hello, world! Here is a chromosome:</p>
     <ul>
     {% for key, val in accession.items %}
         <li><strong>{{ key }}:</strong> {{ val }}</li>
     {% endfor %}
     </ul>
+    -->
+
+    <p> Hello, welcome to Fit23andMe.  Provide your fitbit information to 23andMe for future studies on fitness and genetics. <p>
+
+
+	<button type="button" id="fitbitButton" data-loading-text="Retrieving fitbit data" class="btn btn-primary" autocomplete="off" >
+	  Fitbit
+	</button>
+
+	<script>
+	  $('#fitbitButton').on('click', function () {
+	  	var fitbit_url= 'https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=228JF7&redirect_uri=https%3A%2F%2Flocalhost%3A5000%2Ffitbit-handler&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800';
+	  	window.location=fitbit_url;
+	  });
+	</script>
+
+
+
 </div>
+
