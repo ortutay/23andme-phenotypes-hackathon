@@ -58,7 +58,7 @@ class Index(TtamAuthenticatedMixin, TemplateView):
             user.profile = Profile()
             user.profile.ttam_token = self.request.ttam.api.access_token
             user.profile.save()
-        if not self.request.user:
+        if not self.request.user.is_authenticated():
             login(self.request, user)
 
         phenotype_ids = [
