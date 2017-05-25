@@ -31,7 +31,9 @@ class Index(TtamAuthenticatedMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        #import pdb; pdb.set_trace()
+        context = super().get_context_data(**kwargs)
+        #self.request.ttam.api.account
         accession_id = 'NC_000004.11'
         context['accession'] = self.request.ttam.api.get(
             f'/3/accession/{accession_id}/'
@@ -115,17 +117,31 @@ class FitbitHandlerView(View):
         except KeyError:
             return print('no code in request parameter')
 
-        print("got a code! " + code)
-
-        print('construct a request')
+        print("got a code! " + code) 
 
         token = get_token(code)
         print(token)
 
-        # persist token and show user
-    
-        return JsonResponse({'status': 'not authenticated'})
+        profile = get_profile(token)
+        print(profile)
+        # get interesting data from fitbit
 
+        return JsonResponse({'status': 'request went through'})
+
+def get_profile(token):
+
+    url = 'https://api.fitbit.com/1/user/-/profile.json'
+
+    auth_header = "Bearer " + (base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
+    headers = {"Authorization": auth_header}
+    print(headers)
+    print("response for get token was:" + response.text)
+    r = requests.get(url, headers=headers)
+    print(r.status_code)
+    print(r.headers)
+    print(r.encoding)
+    print(r.text)
+    print(r.json())
 
 
 def get_token(code):

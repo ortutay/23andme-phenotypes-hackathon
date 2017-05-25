@@ -18,6 +18,11 @@ urlpatterns = [
     url(r'^home/$', RedirectView.as_view(url='/'), name='home'),
     url(r'^fitbit-handler/$', my_app_views.FitbitHandlerView.as_view(), name='fitbit-handler'),
     url(r'^facebook-handler/$', my_app_views.FacebookHandlerView.as_view(), name='facebook-handler'),
+    url(r'^withings-handler/$', my_app_views.FitbitHandlerView.as_view(), name='withings-handler'),
+    url(r'^ihealth-handler/$', my_app_views.FitbitHandlerView.as_view(), name='ihealth-handler'),
+    url(r'^ihealth-removal/$', my_app_views.FitbitHandlerView.as_view(), name='ihealth-removal'),
+    url(r'^ihealth-pubsub/$', my_app_views.FitbitHandlerView.as_view(), name='ihealth-pubsub'),
+    url(r'^omran-handler/$', my_app_views.FitbitHandlerView.as_view(), name='omran-handler'),
 ]
 
 
