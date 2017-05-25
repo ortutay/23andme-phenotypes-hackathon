@@ -78,7 +78,7 @@ X_FRAME_OPTIONS = 'DENY'
 API_CLIENT_ID = env('API_CLIENT_ID', default="api_client_id")
 API_CLIENT_SECRET = env('API_CLIENT_SECRET', default="api_client_secret")
 API_REDIRECT_PATH = '/receive_code/'
-API_URL = env('API_URL', default='https://api.23andme.com')
+API_URL = env('API_URL', default='https://api.23andme.product')
 API_SCOPE = 'basic names email'
 CERT_FILE = False
 

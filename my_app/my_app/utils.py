@@ -17,27 +17,30 @@ def headers(ttam_token):
 def get_profile_id(ttam_token):
     url = to_url('/3/account/')
     resp = requests.get(url, verify=False, headers=headers(ttam_token))
-    return json.loads(resp.content)['data'][0]['profiles'][0]['id']
+    print(resp.json())
+    return resp.json()['data'][0]['profiles'][0]['id']
 
 
-def get_phenotype(ttam_token, phenotype_id):
+def get_phenotypes(ttam_token, phenotype_ids):
+    print('ttam_token', ttam_token)
     profile_id = get_profile_id(ttam_token)
-    url = to_url('/3/profile/%s/phenotype/?id=%s' % (profile_id, phenotype_id))
+    url = to_url('/3/profile/%s/phenotype/?id=%s' % (profile_id, ','.join(phenotype_ids)))
     resp = requests.get(url, verify=False, headers=headers(ttam_token))
-    print json.loads(resp.content)
-    return json.loads(resp.content)['data'][0]['value']
+    print('got resp')
+    print(resp.json())
+    return {x['id']: x['value'] for x in resp.json()['data']}
+    return resp.json()['data'][0]['value']
 
 
-def write_phenotype(ttam_token, phenotype_id, value):
+def set_phenotype(ttam_token, phenotype_id, value):
     profile_id = get_profile_id(ttam_token)
     data = {}
     data[phenotype_id] = value
     url = to_url('/3/profile/%s/phenotype/' % profile_id)
-    resp = requests.post(url, verify=False, data=data, headers=headers(ttam_token))
-    print resp
+    requests.post(url, verify=False, data=data, headers=headers(ttam_token))
 
 
 if __name__ == '__main__':
-    token = '61f377b4d485771c3dfdf848b38322e6'
-    write_phenotype(token, 'fitbit_avg_heartrate', 90.5)
-    print get_phenotype(token, 'fitbit_avg_heartrate')
+    token = '657cba20b202fc8066a296353136af7c'
+    set_phenotype(token, 'facebook_images_avg_people', 90.5)
+    print(get_phenotypes(token, ['facebook_images_avg_people']))

@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from my_app.lib.ttam_api.ttam_api.django.views import AuthenticatedMixin as TtamAuthenticatedMixin
 from my_app.lib.ttam_api.ttam_api.django.views import LogoutView as TtamLogoutView
 
+from my_app.my_app import utils
 from my_app.my_app.models import Profile
 
 import json
@@ -30,7 +31,7 @@ class Index(TtamAuthenticatedMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # import pdb; pdb.set_trace()
+
         accession_id = 'NC_000004.11'
         context['accession'] = self.request.ttam.api.get(
             f'/3/accession/{accession_id}/'
@@ -41,17 +42,36 @@ class Index(TtamAuthenticatedMixin, TemplateView):
         context['last_name'] = self.request.ttam.account['last_name']
 
         # this should probably go somewhere else. oh well!
-        user = User.objects.get(email=self.request.ttam.account['email'])
-        if not user:
+        try:
+            user = User.objects.get(email=self.request.ttam.account['email'])
+            print('Found user', user)
+        except User.DoesNotExist:
+            print('Making a new user')
+            print('23andMe token:', self.request.ttam.api.access_token)
             user = User(
                 first_name=self.request.ttam.account['first_name'],
                 last_name=self.request.ttam.account['last_name'],
                 email=self.request.ttam.account['email'],
                 username=self.request.ttam.account['email'],
                 password='password')
-            user.profile = Profile()
             user.save()
-        login(self.request, user)
+            user.profile = Profile()
+            user.profile.ttam_token = self.request.ttam.api.access_token
+            user.profile.save()
+        if not self.request.user:
+            login(self.request, user)
+
+        phenotype_ids = [
+            'facebook_images_avg_people',
+            'facebook_posts_personality_agreeableness',
+            'facebook_posts_personality_conscientiousness',
+            'facebook_posts_personality_emotional',
+            'facebook_posts_personality_extraversion',
+            'facebook_posts_personality_openness',
+        ]
+        phenotypes = utils.get_phenotypes(user.profile.ttam_token, phenotype_ids)
+        context['phenotypes'] = phenotypes
+        # print(phenotypes)
 
         return context
 
@@ -129,10 +149,13 @@ class FacebookHandlerView(View):
     def get(self, request):
         access_token = request.GET['access_token']
         user_id = request.GET['user_id']
+        print(request.user)
         request.user.profile.facebook_token = access_token
         request.user.profile.save()
-        facebook.process(request.user.profile.facebook_token)
-        return JsonResponse({})
+        fb_phenos = facebook.process(request.user.profile.facebook_token)
+        for id, val in fb_phenos.items():
+            print('set pheno', id, val)
+            utils.set_phenotype(request.user.profile.ttam_token, id, val)
         return redirect('/')
 
 

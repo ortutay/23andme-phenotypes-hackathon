@@ -11,18 +11,6 @@
 
   <section>
     <h1>Facebook</h1>
-    <!--
-    <div class="fb-login-button"
-      data-max-rows="1"
-      data-size="large"
-      data-button-type="continue_with"
-      data-show-faces="false"
-      data-auto-logout-link="false"
-      data-use-continue-as="false"
-      data-scope="user_posts,user_education_history,user_photos"
-      ></div>
-     -->
-
     <script type="text/javascript">
      function fb_login() {
        FB.login(function(resp) {
@@ -36,5 +24,19 @@
     </script>
     <fb:login-button scope="user_posts,user_education_history,user_photos" onlogin="fb_login();"></fb:login-button>
   </section>
+
+  <table class="phenos">
+    <tr>
+      <th>Phenotype ID</th>
+      <th>Value</th>
+    </tr>
+    {% for k, v in phenotypes.items %}
+    <tr>
+      <td>{{k}}</td>
+      <td>{{v}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  
 </div>
 {% endblock content %}

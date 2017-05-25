@@ -1,10 +1,17 @@
 import arrow
+import os
 import pprint
 import requests
 
+from joblib import Memory
 from watson_developer_cloud import PersonalityInsightsV3, VisualRecognitionV3
 
 pp = pprint.PrettyPrinter()
+
+
+CACHE_DIR = '/tmp/ttam-hack-cache'
+os.makedirs(CACHE_DIR, exist_ok=True)
+memory = Memory(cachedir=CACHE_DIR)
 
 
 CREDENTIALS_PERSONALITY = {
@@ -30,6 +37,7 @@ visual_recognition = VisualRecognitionV3(
     api_key=CREDENTIALS_VISUAL['api_key'])
 
 
+@memory.cache
 def process(access_token):
     phenos = {}
     for k, v in process_posts(access_token).items():
@@ -83,3 +91,8 @@ def process_images(access_token):
         'facebook_images_avg_people': count / len(images),
     }
     return phenos
+
+
+if __name__ == '__main__':
+    r = process('EAAH8H7ZAoUBIBALWoQxmtlFYHLadgLAerBGYJp86ZAY6jnvl2hwUZAxt2CqktpfWSMKGfHTYS8K1DtZAThJ5TFr1aJt1W20W32ux9mPHOhlo1RdIbXSyZCYK2OdfJcG3Of2PbBY1ZC1Tn0OSANQiPgoicCiqJfTQyZAqpjbTRVJ9VFnWhkuZAWuzA9ZAcknk8Wp8ZD')
+    pp.pprint(r)
