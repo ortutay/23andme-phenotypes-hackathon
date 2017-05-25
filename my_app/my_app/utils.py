@@ -24,6 +24,7 @@ def get_phenotype(ttam_token, phenotype_id):
     profile_id = get_profile_id(ttam_token)
     url = to_url('/3/profile/%s/phenotype/?id=%s' % (profile_id, phenotype_id))
     resp = requests.get(url, verify=False, headers=headers(ttam_token))
+    print json.loads(resp.content)
     return json.loads(resp.content)['data'][0]['value']
 
 
@@ -38,5 +39,5 @@ def write_phenotype(ttam_token, phenotype_id, value):
 
 if __name__ == '__main__':
     token = '61f377b4d485771c3dfdf848b38322e6'
-    write_phenotype(token, 'weight_g', 300)
-    print get_phenotype(token, 'weight_g')
+    write_phenotype(token, 'fitbit_avg_heartrate', 90.5)
+    print get_phenotype(token, 'fitbit_avg_heartrate')
