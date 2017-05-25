@@ -18,8 +18,9 @@ class Index(TtamAuthenticatedMixin, TemplateView):
     template_name = 'index/index.html'
 
     def get_context_data(self, **kwargs):
+        import pdb; pdb.set_trace()
         context = super().get_context_data(**kwargs)
-
+        self.request.ttam.api.account
         accession_id = 'NC_000004.11'
         context['accession'] = self.request.ttam.api.get(
             f'/3/accession/{accession_id}/'
@@ -55,6 +56,8 @@ class FitbitHandlerView(View):
         print(self)
         print(request)
         print(request.GET)
+        print("does the request have a user?")
+        print(request.user)
 
         # body_unicode = request.body.decode('utf-8')
         # print('body_unicode' + body_unicode)
@@ -83,12 +86,14 @@ class FitbitHandlerView(View):
 
 def get_token(code):
     # client_auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
-    auth_header = "Bearer " + str(base64.b64encode(("%s:%s" % (CLIENT_ID, CLIENT_SECRET)).encode('ascii')))
+    auth_header = "Basic " + (base64.b64encode(("%s:%s" % (CLIENT_ID, CLIENT_SECRET)).encode('ascii')).decode('ascii'))
     post_data = {"grant_type": "authorization_code",
                  "code": code,
                  "client_id": CLIENT_ID,
+                 "redirect_uri": "https://localhost:5000/fitbit-handler",
                  "expires_in": 3*24*3600}
     headers = {"Authorization": auth_header}
+    print(headers)
     url = "https://api.fitbit.com/oauth2/token"
     response = requests.post(url, headers=headers, data=post_data)
     print("response for get token was:" + response.text)
