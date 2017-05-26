@@ -42,9 +42,15 @@ def get_allele(ttam_token, accession_id, start, end):
     url = to_url('/3/profile/%s/variant/?accession_id=%s&start=%s&end=%s' % (profile_id, accession_id, start, end))
     print(url)
     resp = requests.get(url, verify=False, headers=headers(ttam_token))
+    print('ALLELES')
     print(resp.json())
     d = resp.json()
-    return d['data'][0]['allele'] + d['data'][1]['allele']
+    alleles = []
+    for v in d['data']:
+        for i in range(int(v['dosage'])):
+            alleles.append(v['allele'])
+    alleles.sort()
+    return ''.join(alleles)
 
 
 def get_phenotypes(ttam_token, phenotype_ids):

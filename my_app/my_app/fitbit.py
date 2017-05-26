@@ -2,6 +2,9 @@ import arrow
 import requests
 # from my_app.my_app import utils
 
+import pprint
+pp = pprint.PrettyPrinter()
+
 
 def process(token):
     d = {}
@@ -34,8 +37,9 @@ def get_bedtime(token):
     r = requests.get(url, headers=headers)
     d = r.json()
     v = 0.
+    pp.pprint(d)
     for i in d['sleep']:
-        dt = arrow.get(v['startTime']).datetime
+        dt = arrow.get(i['startTime']).datetime
         v += dt.hour + dt.minute/60.
     if not len(d['sleep']):
         return 0

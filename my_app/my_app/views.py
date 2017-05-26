@@ -93,7 +93,7 @@ class Results(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        snps = self.request.GET.get('marker_ids', '').split(',')
+        snps = self.request.GET.get('snps', '').split(',')
 
         context['results'] = {}
         for snp in snps:
