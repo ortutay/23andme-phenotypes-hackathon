@@ -29,7 +29,6 @@ def get_phenotypes(ttam_token, phenotype_ids):
     print('got resp')
     print(resp.json())
     return {x['id']: x['value'] for x in resp.json()['data']}
-    return resp.json()['data'][0]['value']
 
 
 def set_phenotype(ttam_token, phenotype_id, value):
@@ -41,6 +40,6 @@ def set_phenotype(ttam_token, phenotype_id, value):
 
 
 if __name__ == '__main__':
-    token = '657cba20b202fc8066a296353136af7c'
-    set_phenotype(token, 'facebook_images_avg_people', 90.5)
-    print(get_phenotypes(token, ['facebook_images_avg_people']))
+    token = 'TODO'
+    set_phenotype(token, 'fitbit_num_steps', 90)
+    print(get_phenotypes(token, ['fitbit_num_steps']))

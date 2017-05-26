@@ -64,6 +64,12 @@ class Index(TtamAuthenticatedMixin, TemplateView):
             login(self.request, user)
 
         phenotype_ids = [
+            # Fitbit
+            'fitbit_avg_num_steps',
+            'fitbit_avg_heartrate',
+            'fitbit_sleep_duration',
+
+            # Facebook
             'facebook_images_avg_people',
             'facebook_posts_personality_agreeableness',
             'facebook_posts_personality_conscientiousness',
@@ -119,30 +125,94 @@ class FitbitHandlerView(View):
 
         print("got a code! " + code) 
 
-        token = get_token(code)
-        print(token)
+        token, refreshtoken = get_token(code)
+        print("got a token! " + token)
+        #print("refresh token! " + refreshtoken)
 
-        profile = get_profile(token)
-        print(profile)
-        # get interesting data from fitbit
+        d = {}
+        d['fitbit_avg_num_steps'] = get_avg_steps(token)
+        #print("avg_steps " + steps)
 
-        return JsonResponse({'status': 'request went through'})
+        d['fitbit_avg_heartrate'] = get_resting_heartrate(token)
+        #print("avg_resting_heart_rate " + avg_resting_heartrate)
 
-def get_profile(token):
+        d['fitbit_sleep_duration'] = get_sleep_duration(token)
+        #print("sleep duration " +  sleep_duration)
+        for id, val in d.items():
+            print('set pheno', id, val)
+            utils.set_phenotype(request.user.profile.ttam_token, id, val)
+        return redirect('/')
 
-    url = 'https://api.fitbit.com/1/user/-/profile.json'
 
-    auth_header = "Bearer " + (base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
+def get_sleep_duration(token):
+
+    url = 'https://api.fitbit.com/1.2/user/-/sleep/list.json?beforeDate=2017-03-27&sort=desc&offset=0&limit=1'
+    auth_header = "Bearer " + token #(base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
     headers = {"Authorization": auth_header}
     print(headers)
-    print("response for get token was:" + response.text)
     r = requests.get(url, headers=headers)
-    print(r.status_code)
-    print(r.headers)
-    print(r.encoding)
-    print(r.text)
-    print(r.json())
+    print("response for get token was:" + r.text)
+    d = r.json()
 
+    v = 0.
+    for i in d['sleep']:
+
+        v += int(i['minutesAsleep'])
+
+    v = v/len(d['sleep'])
+
+    return v
+
+
+def get_resting_heartrate(token):
+
+    url = 'https://api.fitbit.com/1/user/-/activities/heart/date/today/30d.json'
+    auth_header = "Bearer " + token #(base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
+    headers = {"Authorization": auth_header}
+    print(headers)
+    r = requests.get(url, headers=headers)
+    print("response for get token was:" + r.text)
+    d = r.json()
+
+    v = 0.
+    count = 0
+    for i in d['activities-heart']:
+        print(i)
+        print(i['value'])
+        if 'restingHeartRate' not in i['value']:
+            continue
+        count += 1
+        v += int(i['value']['restingHeartRate'])
+
+    v = v/count
+
+    return v
+
+
+def get_avg_steps(token):
+
+    # get steps from last year for current user
+    url = 'https://api.fitbit.com/1/user/-/activities/steps/date/today/1y.json'
+
+    auth_header = "Bearer " + token #(base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
+
+    headers = {"Authorization": auth_header}
+    print(headers)
+    r = requests.get(url, headers=headers)
+    print("response for get token was:" + r.text)
+
+    d = r.json()
+    print(d['activities-steps'])
+
+    total_steps = 0.
+    for i in d['activities-steps']:
+        total_steps += int(i['value'])
+
+    avg_steps = total_steps/len(d['activities-steps'])
+    print(avg_steps)
+
+    # get total number of steps and divide by 365
+    return avg_steps
 
 def get_token(code):
     # client_auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
@@ -158,8 +228,7 @@ def get_token(code):
     response = requests.post(url, headers=headers, data=post_data)
     print("response for get token was:" + response.text)
     token_json = response.json()
-    return token_json["access_token"]
-
+    return token_json["access_token"],token_json["refresh_token"]
 
 class FacebookHandlerView(View):
     def get(self, request):
@@ -173,7 +242,6 @@ class FacebookHandlerView(View):
             print('set pheno', id, val)
             utils.set_phenotype(request.user.profile.ttam_token, id, val)
         return redirect('/')
-
 
 @never_cache
 def status(request):
