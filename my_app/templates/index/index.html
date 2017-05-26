@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load ph_id %}
 
 {% block content %}
 
@@ -34,16 +35,16 @@
   </section>
 
   <br><br>
-  <h3> Research Phenotypes </h3>
+  <h3> Your Phenotypes </h3>
   <br>
-  <table class="table">
+  <table class="table" style="width: 50%">
     <tr>
       <th>Phenotype ID</th>
       <th>Value</th>
     </tr>
     {% for k, v in phenotypes.items %}
     <tr>
-      <td>{{k}}</td>
+      <td>{{k|ph_id}}</td>
       <td>{{v}}</td>
     </tr>
     {% endfor %}

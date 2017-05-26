@@ -1,18 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load ph_id %}
 
 {% block content %}
 <div class="container">
   <h1>Rich Phenotypes Analysis</h1>
-  {% for result in results %}
-  <div><b>{{ result.snp }}</b> and <b>{{ result.phenotype }}</b></div>
+  {% for snp, snp_results in results.items %}
+  <h2>{{ snp }}</h2>
+    {% for result in snp_results %}
+    <div><b>{{ snp }}</b> and <b>{{ result.phenotype|ph_id }}</b></div>
 
-  <table class="results">
-    <tr><th>Allele</th><th>Average {{ result.phenotype }}</th></tr>
-    <tr><td>{{ result.alleles.0 }}</td><td>{{ result.data.0 }}</tr>
-    <tr><td>{{ result.alleles.1 }}</td><td>{{ result.data.1 }}</tr>
-    <tr><td>{{ result.alleles.2 }}</td><td>{{ result.data.2 }}</tr>
-  </table>
+    <table class="results">
+      <tr><th>Allele</th><th>{{ result.phenotype|ph_id }}</th></tr>
+      {% for allele, avg_value in result.data.items %}
+      <tr><td>{{ allele }}</td><td>{{ avg_value }}</tr>
+      {% endfor %}
+    </table>
+    {% endfor %}
   {% endfor %}
 </div>
 {% endblock content %}

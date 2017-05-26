@@ -27,6 +27,20 @@ from my_app.my_app import query
 CLIENT_ID = '228JF7'
 CLIENT_SECRET = '188fe570134d6630e372c8cff3cac04f'
 
+PHENOTYPE_IDS = [
+   # Fitbit
+   'fitbit_avg_num_steps',
+   'fitbit_avg_heartrate',
+   'fitbit_sleep_duration',
+
+   # Facebook
+   'facebook_images_avg_people',
+   'facebook_posts_personality_agreeableness',
+   'facebook_posts_personality_conscientiousness',
+   'facebook_posts_personality_emotional',
+   'facebook_posts_personality_extraversion',
+   'facebook_posts_personality_openness',
+]
 
 class Index(TtamAuthenticatedMixin, TemplateView):
     template_name = 'index/index.html'
@@ -65,21 +79,7 @@ class Index(TtamAuthenticatedMixin, TemplateView):
         if not self.request.user.is_authenticated():
             login(self.request, user)
 
-        phenotype_ids = [
-            # Fitbit
-            'fitbit_avg_num_steps',
-            'fitbit_avg_heartrate',
-            'fitbit_sleep_duration',
-
-            # Facebook
-            'facebook_images_avg_people',
-            'facebook_posts_personality_agreeableness',
-            'facebook_posts_personality_conscientiousness',
-            'facebook_posts_personality_emotional',
-            'facebook_posts_personality_extraversion',
-            'facebook_posts_personality_openness',
-        ]
-        phenotypes = utils.get_phenotypes(user.profile.ttam_token, phenotype_ids)
+        phenotypes = utils.get_phenotypes(user.profile.ttam_token, PHENOTYPE_IDS)
         context['phenotypes'] = phenotypes
         # print(phenotypes)
 
@@ -92,25 +92,22 @@ class Results(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        queries = [
-            (
-                'rs1558902',
-                'variant.NC_000016.9:53818459-53818460:T',
-                'composed_phenotype.weight',
-                ['AA', 'AT', 'TT'],
-            ),
-        ]
+        snps = self.request.GET.get('marker_ids', '').split(',')
 
-        context['results'] = []
-        for snp, variant, phenotype, alleles in queries:
-            context['results'].append({
-                'snp': snp,
-                'variant': variant,
-                'alleles': alleles,
-                'phenotype': phenotype,
-                'data': query.do_request(variant, phenotype),
-            })
-
+        context['results'] = {}
+        for snp in snps:
+            context['results'][snp] = []
+            for phenotype_id in PHENOTYPE_IDS:
+                accession_id, start = utils.get_variant_from_marker(snp)
+                data = query.do_request(accession_id, start, phenotype_id)
+                if not data:
+                    continue
+                context['results'][snp].append({
+                    'snp': snp,
+                    'variant': '',
+                    'phenotype': phenotype_id,
+                    'data': data
+                })
         return context
 
 
@@ -144,7 +141,7 @@ class FitbitHandlerView(View):
         fitbit_phenos = fitbit.process(token)
         for id, val in fitbit_phenos.items():
             print('set pheno', id, val)
-            utils.set_phenotype(request.user.profile.ttam_token, id, val)
+            utils.set_phenotype(request.user, id, val)
         return redirect('/')
 
 
@@ -162,19 +159,21 @@ def get_token(code):
     response = requests.post(url, headers=headers, data=post_data)
     print("response for get token was:" + response.text)
     token_json = response.json()
-    return token_json["access_token"],token_json["refresh_token"]
+    return token_json["access_token"], token_json["refresh_token"]
+
 
 class FacebookHandlerView(View):
     def get(self, request):
         access_token = request.GET['access_token']
         user_id = request.GET['user_id']
         print(request.user)
-        request.user.profile.facebook_token = access_token
-        request.user.profile.save()
+        if not request.user.profile.facebook_token:
+            request.user.profile.facebook_token = access_token
+            request.user.profile.save()
         fb_phenos = facebook.process(request.user.profile.facebook_token)
         for id, val in fb_phenos.items():
             print('set pheno', id, val)
-            utils.set_phenotype(request.user.profile.ttam_token, id, val)
+            utils.set_phenotype(request.user, id, val)
         return redirect('/')
 
 @never_cache

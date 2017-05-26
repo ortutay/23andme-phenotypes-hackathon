@@ -3,10 +3,23 @@ import time
 
 import requests
 
+from my_app.my_app import utils
+from my_app.my_app.models import Phenotype
+
 pp = pprint.PrettyPrinter()
 
 
-def do_request(variant, pheno):
+def do_request(accession_id, start, phenotype_id):
+    r = {}
+    phenotypes = Phenotype.objects.filter(phenotype_id=phenotype_id)
+    for phenotype in phenotypes:
+        allele = utils.get_allele(phenotype.user.profile.ttam_token, accession_id, start, start + 1)
+        print('%s -> %s' % (allele, phenotype.value))
+        r[allele] = r.get(allele, 0.0) + phenotype.value  # TODO: defauldict
+    return r
+
+
+def do_request_old(variant, pheno):
     pheno_query = 'AVG(%s)' % pheno
     body = """{
   "parameters": {

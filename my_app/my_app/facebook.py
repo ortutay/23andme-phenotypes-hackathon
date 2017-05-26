@@ -3,12 +3,11 @@ import os
 import pprint
 import requests
 
-from joblib import Memory
 from watson_developer_cloud import PersonalityInsightsV3, VisualRecognitionV3
 
 pp = pprint.PrettyPrinter()
 
-
+from joblib import Memory
 CACHE_DIR = '/tmp/ttam-hack-cache'
 os.makedirs(CACHE_DIR, exist_ok=True)
 memory = Memory(cachedir=CACHE_DIR)
@@ -39,6 +38,7 @@ visual_recognition = VisualRecognitionV3(
 
 @memory.cache
 def process(access_token):
+    # return {'facebook_images_avg_people': 1.24}
     phenos = {}
     for k, v in process_posts(access_token).items():
         phenos[k] = v

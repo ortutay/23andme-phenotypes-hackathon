@@ -7,3 +7,10 @@ class Profile(models.Model):
     ttam_token = models.CharField(max_length=1000, null=True)
     fitbit_token = models.CharField(max_length=1000, null=True)
     facebook_token = models.CharField(max_length=1000, null=True)
+
+
+class Phenotype(models.Model):
+    user = models.ForeignKey(User)
+    profile_id = models.CharField(max_length=1000)
+    phenotype_id = models.CharField(max_length=1000)
+    value = models.FloatField()
