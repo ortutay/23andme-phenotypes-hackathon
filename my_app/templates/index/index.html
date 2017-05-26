@@ -2,15 +2,22 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
+
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-body">
+
+  <h2>Allow 23andMe to improve your genetic reports</h2>
+  <br><br>
+
+<!--div class="container">
   <section class="index-hello-world">
-    <div class="index-hello-world-container">
-      {% include 'index/includes/hello_message.html' %}
-    </div>
-  </section>
+    <div class="index-hello-world-container"-->
+  <section>{% include 'index/includes/hello_message.html' %}</section>
+
 
   <section>
-    <h1>Facebook</h1>
+    <h3>Connect to Facebook</h3>
     <script type="text/javascript">
      function fb_login() {
        FB.login(function(resp) {
@@ -22,10 +29,14 @@
        })
      }
     </script>
+    <br>
     <fb:login-button scope="user_posts,user_education_history,user_photos" onlogin="fb_login();"></fb:login-button>
   </section>
 
-  <table class="phenos">
+  <br><br>
+  <h3> Research Phenotypes </h3>
+  <br>
+  <table class="table">
     <tr>
       <th>Phenotype ID</th>
       <th>Value</th>
