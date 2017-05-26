@@ -20,6 +20,7 @@ import base64
 import requests
 
 from my_app.my_app import facebook
+from my_app.my_app import fitbit
 
 
 CLIENT_ID = '228JF7'
@@ -105,114 +106,17 @@ class LogoutView(TtamLogoutView):
 class FitbitHandlerView(View):
 
     def get(self, request):
-        print(self)
-        print(request)
-        print(request.GET)
-        print("does the request have a user?")
-        print(request.user)
-
-        # body_unicode = request.body.decode('utf-8')
-        # print('body_unicode' + body_unicode)
-        # body = json.loads(body_unicode)
-        # print('body' + body)
-        # code = body['code']
-        # print('got a code: ', code)
-
         try:
             code = request.GET['code']
         except KeyError:
             return print('no code in request parameter')
-
-        print("got a code! " + code) 
-
         token, refreshtoken = get_token(code)
-        print("got a token! " + token)
-        #print("refresh token! " + refreshtoken)
-
-        d = {}
-        d['fitbit_avg_num_steps'] = get_avg_steps(token)
-        #print("avg_steps " + steps)
-
-        d['fitbit_avg_heartrate'] = get_resting_heartrate(token)
-        #print("avg_resting_heart_rate " + avg_resting_heartrate)
-
-        d['fitbit_sleep_duration'] = get_sleep_duration(token)
-        #print("sleep duration " +  sleep_duration)
-        for id, val in d.items():
+        fitbit_phenos = fitbit.process(token)
+        for id, val in fitbit_phenos.items():
             print('set pheno', id, val)
             utils.set_phenotype(request.user.profile.ttam_token, id, val)
         return redirect('/')
 
-
-def get_sleep_duration(token):
-
-    url = 'https://api.fitbit.com/1.2/user/-/sleep/list.json?beforeDate=2017-03-27&sort=desc&offset=0&limit=1'
-    auth_header = "Bearer " + token #(base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
-    headers = {"Authorization": auth_header}
-    print(headers)
-    r = requests.get(url, headers=headers)
-    print("response for get token was:" + r.text)
-    d = r.json()
-
-    v = 0.
-    for i in d['sleep']:
-
-        v += int(i['minutesAsleep'])
-
-    v = v/len(d['sleep'])
-
-    return v
-
-
-def get_resting_heartrate(token):
-
-    url = 'https://api.fitbit.com/1/user/-/activities/heart/date/today/30d.json'
-    auth_header = "Bearer " + token #(base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
-    headers = {"Authorization": auth_header}
-    print(headers)
-    r = requests.get(url, headers=headers)
-    print("response for get token was:" + r.text)
-    d = r.json()
-
-    v = 0.
-    count = 0
-    for i in d['activities-heart']:
-        print(i)
-        print(i['value'])
-        if 'restingHeartRate' not in i['value']:
-            continue
-        count += 1
-        v += int(i['value']['restingHeartRate'])
-
-    v = v/count
-
-    return v
-
-
-def get_avg_steps(token):
-
-    # get steps from last year for current user
-    url = 'https://api.fitbit.com/1/user/-/activities/steps/date/today/1y.json'
-
-    auth_header = "Bearer " + token #(base64.b64encode(("%s" % (token)).encode('ascii')).decode('ascii'))
-
-    headers = {"Authorization": auth_header}
-    print(headers)
-    r = requests.get(url, headers=headers)
-    print("response for get token was:" + r.text)
-
-    d = r.json()
-    print(d['activities-steps'])
-
-    total_steps = 0.
-    for i in d['activities-steps']:
-        total_steps += int(i['value'])
-
-    avg_steps = total_steps/len(d['activities-steps'])
-    print(avg_steps)
-
-    # get total number of steps and divide by 365
-    return avg_steps
 
 def get_token(code):
     # client_auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
