@@ -32,6 +32,7 @@ PHENOTYPE_IDS = [
    'fitbit_avg_num_steps',
    'fitbit_avg_heartrate',
    'fitbit_sleep_duration',
+   'fitbit_bedtime',
 
    # Facebook
    'facebook_images_avg_people',
