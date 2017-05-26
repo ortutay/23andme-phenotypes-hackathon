@@ -21,6 +21,7 @@ import requests
 
 from my_app.my_app import facebook
 from my_app.my_app import fitbit
+from my_app.my_app import query
 
 
 CLIENT_ID = '228JF7'
@@ -83,6 +84,35 @@ class Index(TtamAuthenticatedMixin, TemplateView):
         # print(phenotypes)
 
         return context
+
+
+class Results(TemplateView):
+    template_name = 'index/results.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        queries = [
+            (
+                'rs1558902',
+                'variant.NC_000016.9:53818459-53818460:T',
+                'composed_phenotype.weight',
+                ['AA', 'AT', 'TT'],
+            ),
+        ]
+
+        context['results'] = []
+        for snp, variant, phenotype, alleles in queries:
+            context['results'].append({
+                'snp': snp,
+                'variant': variant,
+                'alleles': alleles,
+                'phenotype': phenotype,
+                'data': query.do_request(variant, phenotype),
+            })
+
+        return context
+
 
 
 class AuthenticatedStatus(View):

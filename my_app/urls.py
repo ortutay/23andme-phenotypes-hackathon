@@ -11,6 +11,7 @@ from .my_app import views as my_app_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', my_app_views.Index.as_view(), name='index'),
+    url(r'^results$', my_app_views.Results.as_view(), name='results'),
     url(r'^_status/$', my_app_views.status, name='status'),
     url(r'^_auth_status/$', my_app_views.AuthenticatedStatus.as_view(), name='auth_status'),
     url(r'^receive_code/$', OauthCallbackView.as_view(), name='oauth_callback'),

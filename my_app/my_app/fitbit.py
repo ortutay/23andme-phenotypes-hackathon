@@ -1,4 +1,5 @@
 import requests
+from my_app.my_app import utils
 
 
 def process(token):
@@ -53,5 +54,7 @@ def get_avg_steps(token):
 
 
 if __name__ == '__main__':
+    ttam_token = '958627908df486c076dcf9e2fe15d350'
+    utils.get_genotype_id(ttam_token)
     d = process('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Skw0RDciLCJhdWQiOiIyMjhKRjciLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcmFjdCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNDk1Nzg3NzM2LCJpYXQiOjE0OTU3NTg5MzZ9.97eAWOUqdxK5ZE3zdk3-vI2tcZ1bTKPKr7ypmt-oUQQ')
-    print(d)
+    utils.to_hbase_insert(ttam_token, d)

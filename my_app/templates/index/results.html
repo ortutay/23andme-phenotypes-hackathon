@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <h1>Rich Phenotypes Analysis</h1>
+  {% for result in results %}
+  <div><b>{{ result.snp }}</b> and <b>{{ result.phenotype }}</b></div>
+
+  <table class="results">
+    <tr><th>Allele</th><th>Average {{ result.phenotype }}</th></tr>
+    <tr><td>{{ result.alleles.0 }}</td><td>{{ result.data.0 }}</tr>
+    <tr><td>{{ result.alleles.1 }}</td><td>{{ result.data.1 }}</tr>
+    <tr><td>{{ result.alleles.2 }}</td><td>{{ result.data.2 }}</tr>
+  </table>
+  {% endfor %}
+</div>
+{% endblock content %}

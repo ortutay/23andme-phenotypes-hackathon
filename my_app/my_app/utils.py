@@ -14,6 +14,13 @@ def headers(ttam_token):
     return {'Authorization': 'Bearer %s' % ttam_token}
 
 
+def get_genotype_id(ttam_token):
+    url = to_url('/3/account/')
+    resp = requests.get(url, verify=False, headers=headers(ttam_token))
+    print(resp.json())
+    # return resp.json()['data'][0]['profiles'][0]['id']
+
+
 def get_profile_id(ttam_token):
     url = to_url('/3/account/')
     resp = requests.get(url, verify=False, headers=headers(ttam_token))
@@ -37,6 +44,11 @@ def set_phenotype(ttam_token, phenotype_id, value):
     data[phenotype_id] = value
     url = to_url('/3/profile/%s/phenotype/' % profile_id)
     requests.post(url, verify=False, data=data, headers=headers(ttam_token))
+
+
+def to_hbase_insert(ttam_token, phenotypes):
+    for id, val in phenotypes.items():
+        print("""UPSERT INTO ibd_pheno (concept_id, concept_name, genotype_id, float_val) VALUES ('%s', '%s', %s, %s);""" % (id, id, 123, val))
 
 
 if __name__ == '__main__':
